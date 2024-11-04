@@ -51,7 +51,7 @@ export const {
 export const startGame = (inputUsername) => async (dispatch) => {
   dispatch(setUsername(inputUsername));
   dispatch(setcanDraw(true));
-  const response = await axios.post("http://localhost:8080/start-game", {
+  const response = await axios.post("https://catburstbackend.onrender.com/start-game", {
     username: inputUsername,
   });
   dispatch(setDeck(response.data.deck));
@@ -62,7 +62,7 @@ export const lboard = (payload) => async(dispatch)=> {
 };
 
 export const drawCard = (username) => async (dispatch) => {
-  const response = await axios.post("http://localhost:8080/draw-card", {
+  const response = await axios.post("https://catburstbackend.onrender.com/draw-card", {
     username,
   });
   dispatch(setCardDrawn(response.data.card));
