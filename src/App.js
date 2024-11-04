@@ -30,7 +30,7 @@ function App() {
     let ws;
 
     const connect = () => {
-      ws = new WebSocket("ws://localhost:8080/ws");
+      ws = new WebSocket("ws://catburstbackend.onrender.com/ws");  
 
       ws.onopen = () => {
         console.log("WebSocket connected");
