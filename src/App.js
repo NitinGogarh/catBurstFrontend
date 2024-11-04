@@ -10,7 +10,7 @@ function App() {
   );
 
   const [inputUsername, setInputUsername] = useState("");
-  const [cardFlipped, setCardFlipped] = useState(false);
+  const [showCard, setShowCard] = useState(false);
 
   const handleRegister = () => {
     if (inputUsername) {
@@ -21,8 +21,8 @@ function App() {
   const handleDrawCard = () => {
     if (username) {
       dispatch(drawCard(username));
-      setCardFlipped(true);
-      setTimeout(() => setCardFlipped(false), 1000);
+      setShowCard(true);
+      setTimeout(() => setShowCard(false), 1000); // Hide the card after 1 second
     }
   };
 
@@ -30,26 +30,16 @@ function App() {
     let ws;
 
     const connect = () => {
-      ws = new WebSocket("wss://catburstbackend.onrender.com/ws");  
+      ws = new WebSocket("wss://catburstbackend.onrender.com/ws");
 
-      ws.onopen = () => {
-        console.log("WebSocket connected");
-      };
-
+      ws.onopen = () => console.log("WebSocket connected");
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("Message:", data);
-        if (data) {
-          dispatch(lboard(data));
-        }
+        if (data) dispatch(lboard(data));
       };
 
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-
+      ws.onerror = (error) => console.error("WebSocket error:", error);
       ws.onclose = (event) => {
-        console.log("WebSocket closed, reconnecting...", event);
         setTimeout(connect, 3000);
       };
     };
@@ -64,6 +54,7 @@ function App() {
   return (
     <>
       <Toaster position="top-center" />
+
       <div
         style={{
           textAlign: "center",
@@ -78,7 +69,8 @@ function App() {
           transition: "transform 0.2s ease-in-out",
         }}
       >
-        <h1 style={{ fontSize: "2.8em", color: "#fff", marginBottom: "10px" }}>  Kitten Game</h1>
+        <h1 style={{ fontSize: "2.8em", color: "#fff", marginBottom: "10px" }}> Kitten Game</h1>
+
         {!username ? (
           <div style={{ margin: "20px 0" }}>
             <input
@@ -117,63 +109,34 @@ function App() {
             </button>
           </div>
         ) : (
-          <div style={{ marginTop: "20px",display:"flex", flexDirection:"column" ,justifyContent:"center" ,alignItems:"center" }}>
-            <h2>Welcome..., {username}!</h2>
+          <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <h2>Welcome, {username}!</h2>
             <div
               style={{
                 display: "inline-block",
                 width: "120px",
                 height: "180px",
                 marginTop: "20px",
-                perspective: "1000px",
+                position: "relative",
               }}
             >
               <div
                 style={{
+                  position: "absolute",
                   width: "100%",
                   height: "100%",
-                  transition: "transform 0.6s",
-                  transformStyle: "preserve-3d",
-                  transform: cardFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-                  boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+                  backgroundColor: "#333",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1.5em",
                   borderRadius: "10px",
+                  transition: "transform 0.5s",
+                  transform: showCard ? "translateX(0)" : "translateX(-150%)",
                 }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    backfaceVisibility: "hidden",
-                    backgroundColor: "#333",
-                    color: "white",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.5em",
-                    borderRadius: "10px",
-                  }}
-                >
-                🃏
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    backfaceVisibility: "hidden",
-                    backgroundColor: "#4caf50",
-                    color: "white",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.5em",
-                    transform: "rotateY(180deg)",
-                    borderRadius: "10px",
-                  }}
-                >
-                  {cardDrawn || "?"}
-                </div>
+                {cardDrawn || ""}
               </div>
             </div>
             {canDraw && (
@@ -205,6 +168,7 @@ function App() {
             )}
           </div>
         )}
+
         <div style={{ marginTop: "30px" }}>
           <h2 style={{ color: "#fff", fontSize: "1.8em", marginBottom: "15px" }}>Leaderboard</h2>
           <ul style={{ listStyle: "none", padding: 0, textAlign: "left", fontWeight: "bold" }}>
